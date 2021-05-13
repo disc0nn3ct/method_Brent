@@ -31,7 +31,7 @@ ll method_Brent(ll m, uint c)
     std::cout << "Будет произведено " << " c = " << c << ", " << pow(2, c) << " шагов " << std::endl;    
     if (c == 0)
         return 0;
-    ll z=0,x=1;
+    ll z=0,x=rand() % m;
     int n=0, k=0, t=1;
     to_3:
     std::cout  << "x = " << x << " t = " << t << " n = " << n << " k = " << k <<" z = " << z << std::endl;    
@@ -62,8 +62,8 @@ ll method_Brent(ll m, uint c)
     // std::cout << " =========================== " << p <<  std::endl;
     // if( m>p && p>1)
     //     return p;
-    else 
-        goto to_3;
+    // else 
+    //     goto to_3;
 }
 
 
@@ -71,12 +71,12 @@ int main()
 {
     long long k;
     // std::cin >> k;
-    k = 4294967297;
+    // k = 4294967297;
     // k = 112;
-    // k =4;
-    std::cout << find_divisor(k) << std::endl; // 4294967297
+    k =4;
+    // std::cout << method_Pollard(k) << std::endl; // 4294967297
     std::cout << "======" << std::endl;
-    std::cout << method_Brent(k, 88) << std::endl; // 4294967297
+    std::cout << method_Brent(k, 5) << std::endl; // 4294967297
 
     return 0;
 }
