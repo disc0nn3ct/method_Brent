@@ -53,7 +53,7 @@ NTL::ZZ method_Brent(NTL::ZZ m, uint c)
     std::cout << "Будет произведено " << " c = " << c << ", " << pow(2, c) << " шагов " << std::endl;    
     if (c == 0)
         return 0;
-    NTL::ZZ z=0,x=rand() % m;
+    NTL::ZZ z=0,x=RandomBnd(m);
     int n=0, k=0, t=1;
     to_3:
     std::cout  << "x = " << x << " t = " << t << " n = " << n << " k = " << k <<" z = " << z << std::endl;    
@@ -76,7 +76,7 @@ NTL::ZZ method_Brent(NTL::ZZ m, uint c)
         t=t*2;
     }
     if (k > c)
-        return 1;
+        return NTL::ZZ(-1);
     else 
         goto to_3;
     // ll p;
