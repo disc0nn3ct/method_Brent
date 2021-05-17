@@ -33,18 +33,18 @@ T method_Pollard(T n, T number_of)
 
 
 
-NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ seed = 1) {
-    NTL::ZZ x = seed, y = seed;
-    NTL::ZZ divisor = 1;
-    while (divisor == 1 || divisor == n) {
-        y = f(y) % n;
-        x = f(f(x) % n) % n;
-        divisor = std::__gcd(std::abs(x-y), n);
-        // std::cout  << "y = " << y << " x = "  << x << " divisor = " << divisor << std::endl;
+// NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ seed = 1) {
+//     NTL::ZZ x = seed, y = seed;
+//     NTL::ZZ divisor = 1;
+//     while (divisor == 1 || divisor == n) {
+//         y = f(y) % n;
+//         x = f(f(x) % n) % n;
+//         divisor = std::__gcd(std::abs(x-y), n);
+//         // std::cout  << "y = " << y << " x = "  << x << " divisor = " << divisor << std::endl;
 
-    }
-    return divisor;
-}
+//     }
+//     return divisor;
+// }
 
 
 
@@ -52,16 +52,19 @@ NTL::ZZ method_Brent(NTL::ZZ m, uint c)
 {
     std::cout << "Будет произведено " << " c = " << c << ", " << pow(2, c) << " шагов " << std::endl;    
     if (c == 0)
-        return 0;
-    NTL::ZZ z=0,x=RandomBnd(m);
-    int n=0, k=0, t=1;
+        return NTL::ZZ(0);
+    NTL::ZZ z, x, n, k, t;
+    z=0;
+    x=RandomBnd(m);
+    n=0; k=0; t=1;
+    
     to_3:
     std::cout  << "x = " << x << " t = " << t << " n = " << n << " k = " << k <<" z = " << z << std::endl;    
     x = f(x) % m;
     n++;
 ////
     NTL::ZZ p;
-    p= std::__gcd(m, std::abs(z-x));
+    p= NTL::GCD(m, NTL::abs(z-x));
     if( m>p && p>1)
     {
         std::cout << " =========================== p = " << p <<  std::endl;
@@ -94,14 +97,14 @@ int main()
     // std::cin >> k;
     // k = 4294967297;
     // k = 112;
-    k =4;
+    k =128;
     // std::cout << method_Pollard(k) << std::endl; // 4294967297
     std::cout << "======" << std::endl;
-    // std::cout << method_Brent(k, 5) << std::endl; // 4294967297
+    std::cout << method_Brent(k, 5) << std::endl; // 4294967297
 
-    NTL::ZZ t, r, l;
-	t=2;
-	r=-1; l=3;
-    std::cout << "PER " << abs(t-l) << "  === " << r << std::endl;
+ //    NTL::ZZ t, r, l;
+	// t=2;
+	// r=-1; l=3;
+ //    std::cout << "PER " << abs(t-l) << "  === " << r << std::endl;
     return 0;
 }
