@@ -17,18 +17,22 @@ inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 
 
 
-NTL::ZZ method_Pollard(NTL::ZZ n) {
+NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ num_of_tries = NTL::ZZ(10000)) {
     NTL::ZZ x, y, divisor;
-    x = RandomBnd(n);
+    x = RandomBnd(n);	
     y=x;
     divisor = 1;
-    while (divisor == 1 || divisor == n) {
+    // num_of_tries = 10000;
+    while ( (divisor == 1 || divisor == n) && (num_of_tries > 0) ) {
         y = f(y) % n;
         x = f(f(x) % n) % n;
         divisor = NTL::GCD(NTL::abs(x-y), n);
+        num_of_tries--;
         // std::cout  << "y = " << y << " x = "  << x << " divisor = " << divisor << std::endl;
 
     }
+    if (divisor == n)
+    	return NTL::ZZ(1);
     return divisor;
 }
 
@@ -85,9 +89,9 @@ int main()
     // k = 4294967297;
     // k = 112;
     k =128;
-    // std::cout << method_Pollard(k) << std::endl; // 4294967297
+    std::cout << method_Pollard(k) << std::endl; // 4294967297
     std::cout << "======" << std::endl;
-    std::cout << method_Brent(k, 5) << std::endl; // 4294967297
+    std::cout << method_Brent(k, 25) << std::endl; // 4294967297
 
  //    NTL::ZZ t, r, l;
 	// t=2;
