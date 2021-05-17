@@ -1,8 +1,6 @@
 #include <iostream>
 #include <algorithm> 
 
-
-
 #include <NTL/ZZ.h>
 
 #include <cmath>
@@ -15,36 +13,27 @@ inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 // template <class T> T f(T x) { return x*x+1; }
 
 
-template <class T, class T_power> 
-T super_pow(T a, T_power c)
-{
 
 
+
+
+
+
+
+NTL::ZZ method_Pollard(NTL::ZZ n) {
+    NTL::ZZ x, y, divisor;
+    x = RandomBnd(n);
+    y=x;
+    divisor = 1;
+    while (divisor == 1 || divisor == n) {
+        y = f(y) % n;
+        x = f(f(x) % n) % n;
+        divisor = NTL::GCD(NTL::abs(x-y), n);
+        // std::cout  << "y = " << y << " x = "  << x << " divisor = " << divisor << std::endl;
+
+    }
+    return divisor;
 }
-
-template <class T> 
-T method_Pollard(T n, T number_of)
-{
-
-} 
-
-
-
-
-
-
-// NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ seed = 1) {
-//     NTL::ZZ x = seed, y = seed;
-//     NTL::ZZ divisor = 1;
-//     while (divisor == 1 || divisor == n) {
-//         y = f(y) % n;
-//         x = f(f(x) % n) % n;
-//         divisor = std::__gcd(std::abs(x-y), n);
-//         // std::cout  << "y = " << y << " x = "  << x << " divisor = " << divisor << std::endl;
-
-//     }
-//     return divisor;
-// }
 
 
 
