@@ -10,10 +10,7 @@
 // (x+1)*(x+1)
 inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 
-// template <class T> T f(T x) { return x*x+1; }
-
-
-
+// template <class T> T f(T x) { return x*x+1; 
 
 
 
@@ -45,6 +42,7 @@ NTL::ZZ method_Brent(NTL::ZZ m, uint c)
     NTL::ZZ z, x, n, k, t;
     z=0;
     x=RandomBnd(m);
+    std::cout << "was gen == " << x <<std::endl;
     n=0; k=0; t=1;
     
     to_3:
