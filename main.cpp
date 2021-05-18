@@ -11,7 +11,7 @@ inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 
 
 
-NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ num_of_tries = NTL::ZZ(16384)) 
+NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po - algo 
 {
     NTL::ZZ x, y, divisor;
     x = RandomBnd(n);	
@@ -81,8 +81,38 @@ NTL::ZZ idea_method_Brent(NTL::ZZ m, NTL::ZZ num_of_tries = NTL::ZZ(14))
 }
 
 
+NTL::ZZ method_Ferma(NTL::ZZ m) // Только для нечетных
+{
+    ;
+    NTL::ZZ x = SqrRoot(m), y = NTL::ZZ(0), r = x*x - y*y - m;
+    std::cout << "x = "<< x << " y = " << y << " r = " << r << std::endl;
+    for (;;)
+    {
+            std::cout << "x = "<< x << " y = " << y << " r = " << r << std::endl;
 
+        if (r == 0)
+            return x!=y ? x-y : x+y;
+        else
+            if (r > 0)
+            {
+                r -= y+y+1;
+                ++y;
+            }
+            else
+            {
+                r += x+x+1;
+                ++x;
+            }
+    }
+}
 
+bool prime(NTL::ZZ n)
+{ 
+    for(NTL::ZZ i=2;i<=SqrRoot(n);i++)
+        if(n%i==0)
+            return false;
+    return true;
+}
 
 
 
@@ -97,6 +127,7 @@ int main()
     std::cout << " pollard  "  << method_Pollard(k) << std::endl; // 4294967297
     std::cout << "Bernt " <<  method_Brent(k) << std::endl; // 4294967297
     std::cout << "Idea Bernt " <<  idea_method_Brent(k) << std::endl; // 4294967297
-
+    std::cout << "method_Ferma " <<  method_Ferma(NTL::ZZ(4294967297)) << std::endl; // 4294967297
+    
     return 0;
 }
