@@ -2,12 +2,13 @@
 #include <algorithm> 
 #include <NTL/ZZ.h>
 
+#include <string>
+#include <fstream>
 // Алгоритмы возвращают делитель в случае успеха, а в других случаях 1
 
 
 
 inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
-
 
 
 
@@ -108,13 +109,65 @@ NTL::ZZ method_Ferma(NTL::ZZ m) // Только для нечетных
 
 bool prime(NTL::ZZ n)
 { 
-    for(NTL::ZZ i=2;i<=SqrRoot(n);i++)
+    for(NTL::ZZ i=NTL::ZZ(2);i<=SqrRoot(n);i++)
         if(n%i==0)
             return false;
     return true;
 }
 
 
+
+void test()
+{
+    NTL::ZZ k, l;
+    power(k,2,256);
+    power(l,3,256);
+    k = l*k;        
+    std::ofstream fout("log.csv");
+
+    fout << k  << ",";
+
+    auto begin = std::chrono::steady_clock::now();
+
+    method_Pollard(k);
+
+    auto end = std::chrono::steady_clock::now();
+    
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    
+    fout << std::to_string(elapsed_ms.count()) + ',';
+
+
+
+
+    begin = std::chrono::steady_clock::now();
+
+    method_Brent(k);
+
+    end = std::chrono::steady_clock::now();
+    
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    
+    fout << std::to_string(elapsed_ms.count()) + ',';
+
+
+
+    begin = std::chrono::steady_clock::now();
+
+    method_Brent(k);
+
+    end = std::chrono::steady_clock::now();
+    
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    fout << std::to_string(elapsed_ms.count()) + ',';
+
+
+
+
+    fout.close();
+
+}
 
 int main()
 {
@@ -127,7 +180,11 @@ int main()
     std::cout << " pollard  "  << method_Pollard(k) << std::endl; // 4294967297
     std::cout << "Bernt " <<  method_Brent(k) << std::endl; // 4294967297
     std::cout << "Idea Bernt " <<  idea_method_Brent(k) << std::endl; // 4294967297
-    std::cout << "method_Ferma " <<  method_Ferma(NTL::ZZ(4294967297)) << std::endl; // 4294967297
+    // std::cout << "method_Ferma " <<  method_Ferma(NTL::ZZ(4294967297)) << std::endl; // 4294967297
+
+    test();
+
+
     
     return 0;
 }
