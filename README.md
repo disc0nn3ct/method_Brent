@@ -18,9 +18,14 @@
 
 ```
 
-
-Компиляция:
+Компиляция и запуск программы:
 ```shell
-g++ -g -O2 -std=c++11 -pthread -march=native one.cpp -lntl -lgmp -lm
+make
 ```
+
+Для удаления: 
+```shell
+make clean
+```
+
 
