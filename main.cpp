@@ -4,18 +4,20 @@
 
 #include <string>
 #include <fstream>
+#include <sstream>
 // Алгоритмы возвращают делитель в случае успеха, а в других случаях 1
 
 
 
 inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 
+// Для того, чтобы тесты были объективнее, начальное случайное значение будет передаваться в алгоритм
 
-
-NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po - algo 
+NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ x = NTL::ZZ(-1),NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po - algo 
 {
-    NTL::ZZ x, y, divisor;
-    x = RandomBnd(n);	
+    NTL::ZZ y, divisor;
+    if(x==-1)
+        x = RandomBnd(n);	
     y=x;
     divisor = 1;
     while ( (divisor == 1 || divisor == n) && (num_of_tries > 0) ) {
@@ -31,13 +33,14 @@ NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po -
 
 
 
-NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ num_of_tries = NTL::ZZ(14)) // max_i = 14 это 16384, чтобы в 2-х алгоритмах макс число шагов было одинаково 
+NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ x = NTL::ZZ(-1), NTL::ZZ num_of_tries = NTL::ZZ(14)) // max_i = 14 это 16384, чтобы в 2-х алгоритмах макс число шагов было одинаково 
 {
     if (num_of_tries < 1)
         return NTL::ZZ(1);
-    NTL::ZZ z, x, n, k, t;
+    NTL::ZZ z, n, k, t;
     z=0;
-    x=RandomBnd(m);
+    if(x==-1)
+        x=RandomBnd(m);
     n=0; k=0; t=1;
     
     to_3:
@@ -61,10 +64,12 @@ NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ num_of_tries = NTL::ZZ(14)) // max_i = 1
         goto to_3;
 }
 
-NTL::ZZ idea_method_Brent(NTL::ZZ m, NTL::ZZ num_of_tries = NTL::ZZ(14)) 
+NTL::ZZ idea_method_Brent(NTL::ZZ m, NTL::ZZ x= NTL::ZZ(-1), NTL::ZZ num_of_tries = NTL::ZZ(14)) 
 {   
-    NTL::ZZ x=RandomBnd(m), y=f(x) % m, a=y;
-
+    // NTL::ZZ x=RandomBnd(m), y=f(x) % m, a=y;
+    NTL::ZZ y=f(x) % m, a=y;
+    if(x == -1)
+        x=RandomBnd(m);
     for (unsigned i=0, series_len=1; i<num_of_tries; i++, series_len*=2)
         {
             NTL::ZZ g = NTL::GCD(y-x, m);
@@ -84,7 +89,6 @@ NTL::ZZ idea_method_Brent(NTL::ZZ m, NTL::ZZ num_of_tries = NTL::ZZ(14))
 
 NTL::ZZ method_Ferma(NTL::ZZ m) // Только для нечетных
 {
-    ;
     NTL::ZZ x = SqrRoot(m), y = NTL::ZZ(0), r = x*x - y*y - m;
     std::cout << "x = "<< x << " y = " << y << " r = " << r << std::endl;
     for (;;)
@@ -116,51 +120,73 @@ bool prime(NTL::ZZ n)
 }
 
 
+std::string zToString(const NTL::ZZ &z) {
+    std::stringstream buffer;
+    buffer << z;
+    return buffer.str();
+}
+
+std::string str(NTL::ZZ k, NTL::ZZ i)
+{
+    std::string str1;
+    str1=zToString(k) + ",";
+
+
+    auto begin = std::chrono::steady_clock::now();
+
+    method_Pollard(k, i);
+
+    auto end = std::chrono::steady_clock::now();
+    
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+
+
+
+    begin = std::chrono::steady_clock::now();
+
+    method_Brent(k, i);
+
+    end = std::chrono::steady_clock::now();
+    
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+
+
+    begin = std::chrono::steady_clock::now();
+
+    method_Brent(k, i);
+
+    end = std::chrono::steady_clock::now();
+    
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+    std::cout << str1 << std::endl;
+
+
+
+    return str1;
+}
+
 
 void test()
 {
     NTL::ZZ k, l;
     power(k,2,256);
     power(l,3,256);
-    k = l*k;        
+    k = l*k;  
+
+    NTL::ZZ i=RandomBnd(k);
+
     std::ofstream fout("log.csv");
 
-    fout << k  << ",";
-
-    auto begin = std::chrono::steady_clock::now();
-
-    method_Pollard(k);
-
-    auto end = std::chrono::steady_clock::now();
-    
-    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    
-    fout << std::to_string(elapsed_ms.count()) + ',';
-
-
-
-
-    begin = std::chrono::steady_clock::now();
-
-    method_Brent(k);
-
-    end = std::chrono::steady_clock::now();
-    
-    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    
-    fout << std::to_string(elapsed_ms.count()) + ',';
-
-
-
-    begin = std::chrono::steady_clock::now();
-
-    method_Brent(k);
-
-    end = std::chrono::steady_clock::now();
-    
-    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-
-    fout << std::to_string(elapsed_ms.count()) + ',';
+    fout << str(k, i)  << std::endl;
 
 
 
@@ -177,11 +203,10 @@ int main()
 
     power(l,3,256);
     k = l*k;
-    std::cout << " pollard  "  << method_Pollard(k) << std::endl; // 4294967297
-    std::cout << "Bernt " <<  method_Brent(k) << std::endl; // 4294967297
-    std::cout << "Idea Bernt " <<  idea_method_Brent(k) << std::endl; // 4294967297
+    // std::cout << " pollard  "  << method_Pollard(k) << std::endl; // 4294967297
+    // std::cout << "Bernt " <<  method_Brent(k) << std::endl; // 4294967297
+    // std::cout << "Idea Bernt " <<  idea_method_Brent(k) << std::endl; // 4294967297
     // std::cout << "method_Ferma " <<  method_Ferma(NTL::ZZ(4294967297)) << std::endl; // 4294967297
-
     test();
 
 
