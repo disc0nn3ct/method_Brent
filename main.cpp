@@ -2,6 +2,7 @@
 #include <algorithm> 
 #include <NTL/ZZ.h>
 
+#include <map>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -126,7 +127,7 @@ std::string zToString(const NTL::ZZ &z) {
     return buffer.str();
 }
 
-std::string str(NTL::ZZ k, NTL::ZZ i)
+std::string str(NTL::ZZ k, NTL::ZZ i) //  создаю строку с замерами 
 {
     std::string str1;
     str1=zToString(k) + ",";
@@ -169,13 +170,11 @@ std::string str(NTL::ZZ k, NTL::ZZ i)
 
     std::cout << str1 << std::endl;
 
-
-
     return str1;
 }
 
 
-void test()
+void test(uint num_of_test=10)
 {
     NTL::ZZ k, l;
     power(k,2,256);
@@ -186,30 +185,56 @@ void test()
 
     std::ofstream fout("log.csv");
 
-    fout << str(k, i)  << std::endl;
 
-
-
+    for(int l=0; l<num_of_test; l++)
+    {
+        fout << str(k, i)  << std::endl;
+        i=RandomBnd(k);
+    
+    }
 
     fout.close();
 
 }
 
+
+void my_factorizator(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_used)
+{
+    if(m!=1)
+    {
+        if(prime(m) == true)
+            ++res[m]; 
+        else
+        {
+        NTL::ZZ div=NTL::ZZ(1);
+        div=idea_method_Brent(m);
+        if(div==1)
+            if(m%2==0)
+                div=NTL::ZZ(2);
+        if(div==1)
+            div=method_Ferma(m);
+        my_factorizator(div, res, not_used);
+        my_factorizator(m/div, res, not_used);
+        }
+    }
+}
+
+
+
 int main()
 {
+    test(20);
+
+
+
     NTL::ZZ k, l;
-    
     power(k,2,256);
-
     power(l,3,256);
-    k = l*k;
-    // std::cout << " pollard  "  << method_Pollard(k) << std::endl; // 4294967297
-    // std::cout << "Bernt " <<  method_Brent(k) << std::endl; // 4294967297
-    // std::cout << "Idea Bernt " <<  idea_method_Brent(k) << std::endl; // 4294967297
-    // std::cout << "method_Ferma " <<  method_Ferma(NTL::ZZ(4294967297)) << std::endl; // 4294967297
-    test();
-
-
+    k = l*k;  
+    std::map <NTL::ZZ, unsigned> m;
+    my_factorizator(k, m, NTL::ZZ(0));
+    for (std::map <NTL::ZZ, unsigned>::iterator i=m.begin(); i!=m.end(); ++i)
+        std::cout << i->first << ' ' << i->second << std::endl;
     
     return 0;
 }
