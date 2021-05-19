@@ -168,7 +168,7 @@ std::string str(NTL::ZZ k, NTL::ZZ i) //  создаю строку с заме�
 
     str1 += std::to_string(elapsed_ms.count()) + ',';
 
-    std::cout << str1 << std::endl;
+    // std::cout << str1 << std::endl;
 
     return str1;
 }
@@ -223,7 +223,7 @@ void my_factorizator(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_us
 
 int main()
 {
-    test(20);
+    test(100);
 
 
 
