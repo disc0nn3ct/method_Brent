@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 // Алгоритмы возвращают делитель в случае успеха, а в других случаях 1
 
 
@@ -160,7 +161,7 @@ std::string str(NTL::ZZ k, NTL::ZZ i) //  создаю строку с заме�
 
     begin = std::chrono::steady_clock::now();
 
-    method_Brent(k, i);
+    idea_method_Brent(k, i);
 
     end = std::chrono::steady_clock::now();
     
@@ -172,14 +173,22 @@ std::string str(NTL::ZZ k, NTL::ZZ i) //  создаю строку с заме�
 
     return str1;
 }
+    
 
 
-void test(uint num_of_test=10)
+NTL::ZZ num_of_ferma(unsigned long n = 5)
 {
-    NTL::ZZ k, l;
-    power(k,2,256);
-    power(l,3,256);
-    k = l*k;  
+    n = pow(2, n);
+    NTL::ZZ k; 
+    NTL::power(k, 2, n);
+    return k+1;
+
+}
+
+
+
+void test(NTL::ZZ k, uint num_of_test=10)
+{
 
     NTL::ZZ i=RandomBnd(k);
 
@@ -221,20 +230,66 @@ void my_factorizator(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_us
 
 
 
+
+
+
 int main()
 {
-    test(100);
-
-
 
     NTL::ZZ k, l;
     power(k,2,256);
     power(l,3,256);
     k = l*k;  
+    test(k, 100); // Реализована функция, которая заполняет файл log.csv. Замеряет 100 раз функции поиска делителя числа k, разными методами.  
+
     std::map <NTL::ZZ, unsigned> m;
     my_factorizator(k, m, NTL::ZZ(0));
+    std::cout << "Тест на рекурсивный \"Умный\" поиск делителей числа (2^256*3^256) "  << std::endl;
     for (std::map <NTL::ZZ, unsigned>::iterator i=m.begin(); i!=m.end(); ++i)
         std::cout << i->first << ' ' << i->second << std::endl;
     
+    
+    std::cout << std::endl <<"Попробуем найти делитель: (чисело ферма 9)^2 и замерим время поиска" <<std::endl;
+    k = num_of_ferma(9);
+    auto begin = std::chrono::steady_clock::now();
+    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(30));
+    auto end = std::chrono::steady_clock::now();
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
+
+    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " nanoseconds"<< std::endl;
+ 
+
+
+    std::cout << std::endl <<"Попробуем найти делитель:  (2^31-1)*(2^521-1) и замерим время поиска" <<std::endl;
+    power(k, 2, 31);
+    k--;
+    NTL::ZZ r;
+    power(r, 2, 521);
+    r--;
+    k=k*r;
+
+
+    begin = std::chrono::steady_clock::now();
+    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(30));
+    end = std::chrono::steady_clock::now();
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
+
+    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " nanoseconds"<< std::endl;
+ 
+    std::cout << std::endl << "Попробуем найти делитель:  (2^521-1)*(2^521-1) и замерим время поиска" <<std::endl;
+    power(k, 2, 521);
+    k--;
+    power(k, k, 2);
+    
+
+    begin = std::chrono::steady_clock::now();
+    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(35));
+    end = std::chrono::steady_clock::now();
+    elapsed_ms = std::chrono::duration_cast<std::chrono::seconds>(end - begin);    
+
+    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " seconds"<< std::endl;
+ 
+
+
     return 0;
 }
