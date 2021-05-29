@@ -260,7 +260,7 @@ NTL::ZZ number_Kalen(unsigned long n)
 std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с замерами 
 {
     std::string str1;
-    str1=zToString(k) + ",";
+    // str1=zToString(k) + ",";
 
     NTL::ZZ for_test_val = k*k;
 
@@ -281,7 +281,7 @@ std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с з�
     //     goto tryAgain;
     
     
-    str1 += std::to_string(elapsed_ms.count()) + ',';
+    str1 += std::to_string(elapsed_ms.count()) + ',' + zToString(for_test_val) + ',';
 
 
 
