@@ -34,7 +34,7 @@ NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ x = NTL::ZZ(-1),NTL::ZZ num_of_tries =
 }
 
 
-
+// тут x это начальное значение для метода (рандомое)
 NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ x = NTL::ZZ(-1), NTL::ZZ num_of_tries = NTL::ZZ(14)) // max_i = 14 это 16384, чтобы в 2-х алгоритмах макс число шагов было одинаково 
 {
     if (num_of_tries < 1)
@@ -133,40 +133,50 @@ std::string str(NTL::ZZ k, NTL::ZZ i) //  создаю строку с заме�
     std::string str1;
     str1=zToString(k) + ",";
 
-
+    NTL::ZZ for_test_val;
+tryAgain:
     auto begin = std::chrono::steady_clock::now();
 
-    method_Pollard(k, i);
+    for_test_val = method_Pollard(k, i);
 
     auto end = std::chrono::steady_clock::now();
     
     auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    
+
+    if(for_test_val == 1)
+        goto tryAgain;
+        
     str1 += std::to_string(elapsed_ms.count()) + ',';
 
 
 
-
+tryAgain1:
     begin = std::chrono::steady_clock::now();
 
-    method_Brent(k, i);
-
-    end = std::chrono::steady_clock::now();
-    
-    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    
-    str1 += std::to_string(elapsed_ms.count()) + ',';
-
-
-
-    begin = std::chrono::steady_clock::now();
-
-    idea_method_Brent(k, i);
+    for_test_val = method_Brent(k, i);
 
     end = std::chrono::steady_clock::now();
     
     elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
+    if(for_test_val == 1)
+        goto tryAgain1;
+
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+
+tryAgain2:
+    begin = std::chrono::steady_clock::now();
+
+    for_test_val = idea_method_Brent(k, i);
+
+    end = std::chrono::steady_clock::now();
+    
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    if(for_test_val == 1)
+        goto tryAgain2;
+    
     str1 += std::to_string(elapsed_ms.count()) + ',';
 
     // std::cout << str1 << std::endl;
@@ -183,6 +193,14 @@ NTL::ZZ num_of_ferma(unsigned long n = 5)
     NTL::power(k, 2, n);
     return k+1;
 
+}
+
+
+NTL::ZZ num_of_mersen(unsigned long n)
+{
+    NTL::ZZ k; 
+    NTL::power(k, 2, n);
+    return k-1;
 }
 
 
@@ -229,6 +247,68 @@ void my_factorizator(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_us
 }
 
 
+NTL::ZZ number_Kalen(unsigned long n)
+{
+    NTL::ZZ k; 
+    NTL::power(k, 2, n);
+    return n*k+1;
+
+}
+
+
+
+std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с замерами 
+{
+    std::string str1;
+    str1=zToString(k) + ",";
+
+    NTL::ZZ for_test_val = k*k;
+
+// tryAgain:
+    auto begin = std::chrono::steady_clock::now();
+
+    for_test_val = method_Brent(for_test_val, NTL::ZZ(-1), NTL::ZZ(15));
+
+    auto end = std::chrono::steady_clock::now();
+    
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+
+    if(for_test_val == 1)
+    {
+        // std::cout<<"NO" <<std::endl;
+        return "-1";
+    }         
+    //     goto tryAgain;
+    
+    
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+
+
+    return str1;
+}
+
+
+
+void test_for_hard(uint num_of_test=10)
+{
+    std::ofstream fout("log1.csv");
+
+    NTL::ZZ k;
+
+    for(int l=2; l < num_of_test; l++)
+    {
+        k = num_of_mersen(l);
+        // std::cout<< k << std::endl;
+        std::string str1;
+        str1 = str_for_test_on_hard(k);
+        if(str1 != "-1")
+            fout << "2^" << l << "-1," << str1  << std::endl; 
+    }
+
+    fout.close();
+
+}
 
 
 
@@ -275,21 +355,12 @@ int main()
     elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
 
     std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " nanoseconds"<< std::endl;
- 
-    std::cout << std::endl << "Попробуем найти делитель:  (2^521-1)*(2^521-1) и замерим время поиска" <<std::endl;
-    power(k, 2, 521);
-    k--;
-    power(k, k, 2);
-    
 
-    begin = std::chrono::steady_clock::now();
-    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(35));
-    end = std::chrono::steady_clock::now();
-    elapsed_ms = std::chrono::duration_cast<std::chrono::seconds>(end - begin);    
+    std::cout<< std::endl <<"Запуск Теста на числах Мерсена. > запись в файл log1.csv " << std::endl;
 
-    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " seconds"<< std::endl;
- 
+    test_for_hard(1024); // Тест на числах Мерсена. Указываем до какого проверить и записать замеры в файл log1.csv
 
+    std::cout<< "Done! " << std::endl;
 
     return 0;
 }
