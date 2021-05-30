@@ -50,6 +50,7 @@ NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ x = NTL::ZZ(-1), NTL::ZZ num_of_tries = 
     n++;
     NTL::ZZ p;
     p= NTL::GCD(m, NTL::abs(z-x));
+        // std::cout << m << "    " << z-x << std::endl;
     if( m>p && p>1)
     {
         return p;
@@ -260,14 +261,14 @@ NTL::ZZ number_Kalen(unsigned long n)
 std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с замерами 
 {
     std::string str1;
-    // str1=zToString(k) + ",";
+    str1=zToString(k) + ",";
 
     NTL::ZZ for_test_val = k*k;
 
-// tryAgain:
+tryAgain:
     auto begin = std::chrono::steady_clock::now();
 
-    for_test_val = method_Brent(for_test_val, NTL::ZZ(-1), NTL::ZZ(15));
+    for_test_val = method_Brent(for_test_val, NTL::ZZ(-1), NTL::ZZ(32));
 
     auto end = std::chrono::steady_clock::now();
     
@@ -275,14 +276,16 @@ std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с з�
 
     if(for_test_val == 1)
     {
-        // std::cout<<"NO" <<std::endl;
-        return "-1";
-    }         
-    //     goto tryAgain;
-    
-    
-    str1 += std::to_string(elapsed_ms.count()) + ',' + zToString(for_test_val) + ',';
+        std::cout<<"NO" <<std::endl;
+        goto tryAgain;
 
+        // return "-1";
+    }         
+        
+    
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+    // std::cout<< for_test_val<< std::endl<< std::endl;
 
 
     return str1;
@@ -290,26 +293,24 @@ std::string str_for_test_on_hard(NTL::ZZ k) //  создаю строку с з�
 
 
 
-void test_for_hard(uint num_of_test=10)
+void test_for_hard(uint num_of_test=4)
 {
     std::ofstream fout("log1.csv");
 
-    NTL::ZZ k;
+    int p[]={2, 3, 5, 7, 13, 17, 19, 31};
 
-    for(int l=2; l < num_of_test; l++)
+    for(int i=0; i < sizeof(p)/sizeof(int) ; i++)
     {
-        k = num_of_mersen(l);
-        // std::cout<< k << std::endl;
-        std::string str1;
-        str1 = str_for_test_on_hard(k);
-        if(str1 != "-1")
-            fout << "2^" << l << "-1," << str1  << std::endl; 
+        fout << str_for_test_on_hard(num_of_mersen(p[i])*num_of_mersen(p[i])) << "(2^" << p[i] << "-1)^2," << std::endl;
     }
+    NTL::ZZ x;
+    x=NTL::ZZ(489133282872437279)*NTL::ZZ(489133282872437279);
+    fout << str_for_test_on_hard(x) << "(489133282872437279)^2," << std::endl;
+
 
     fout.close();
 
 }
-
 
 
 
@@ -358,7 +359,8 @@ int main()
 
     std::cout<< std::endl <<"Запуск Теста на числах Мерсена. > запись в файл log1.csv " << std::endl;
 
-    test_for_hard(1024); // Тест на числах Мерсена. Указываем до какого проверить и записать замеры в файл log1.csv
+    test_for_hard(); // Тест на числах Мерсена. Указываем до какого проверить и записать замеры в файл log1.csv
+
 
     std::cout<< "Done! " << std::endl;
 
