@@ -235,10 +235,12 @@ void my_factorizator(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_us
         else
         {
         NTL::ZZ div=NTL::ZZ(1);
-        div=idea_method_Brent(m);
+        div=method_Brent(m);
         if(div==1)
             if(m%2==0)
                 div=NTL::ZZ(2);
+        if(div==1)
+            div=idea_method_Brent(m);
         if(div==1)
             div=method_Ferma(m);
         my_factorizator(div, res, not_used);
@@ -314,6 +316,122 @@ void test_for_hard(uint num_of_test=4)
 
 
 
+
+
+void my_factorizator_pollard(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_used)
+{
+    if(m!=1)
+    {
+        if(m!=2)
+                ++res[m];
+            else
+            if(m!=3) 
+                ++res[m];
+            // else   
+            //     if(prime(m) == true)
+            //         ++res[m]; 
+            else
+            {
+                NTL::ZZ div=NTL::ZZ(1);
+                div=method_Pollard(m);
+                my_factorizator(div, res, not_used);
+                my_factorizator(m/div, res, not_used);
+            }
+    }
+}
+
+void my_factorizator_Brent(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_used)
+{
+    if(m!=1)
+    {
+        if(m!=2)
+            ++res[m];
+        else
+        if(m!=3) 
+            ++res[m];
+        // else
+        // if(prime(m) == true)
+        //     ++res[m]; 
+        else
+        {
+        NTL::ZZ div=NTL::ZZ(1);
+        div=method_Brent(m);
+        my_factorizator(div, res, not_used);
+        my_factorizator(m/div, res, not_used);
+        }
+    }
+}
+
+
+
+// Структура строки : число, умный факторизатор, Чисто методом Полларда, Чисто методом Брента
+std::string str_for_test_on_hard_factorisation(NTL::ZZ k) //  создаю строку с замерами времени факторизации чисел 
+{
+    std::string str1;
+    str1=zToString(k) + ",";
+    
+    std::map <NTL::ZZ, unsigned> m;
+    auto begin = std::chrono::steady_clock::now();
+    my_factorizator(k, m, NTL::ZZ(0));
+    auto end = std::chrono::steady_clock::now();
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
+
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+    
+    std::map <NTL::ZZ, unsigned> m_1;
+    begin = std::chrono::steady_clock::now();
+    my_factorizator_Brent(k, m_1, NTL::ZZ(0));
+    end = std::chrono::steady_clock::now();
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);  
+  
+
+    str1 += std::to_string(elapsed_ms.count()) + ',';
+
+
+    std::map <NTL::ZZ, unsigned> m_2;
+
+    begin = std::chrono::steady_clock::now();
+    my_factorizator_pollard(k, m_2, NTL::ZZ(0));
+    end = std::chrono::steady_clock::now();
+    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);  
+
+    str1 += std::to_string(elapsed_ms.count());
+
+
+    return str1;
+}
+
+
+void test_on_num()
+{
+    std::ofstream fout("log_main.csv");
+    
+    NTL::ZZ k, l;
+
+    for(int i=200; i < 10000; i+=200 )
+    {
+        // power(k, num_of_mersen(7), i);
+        power(k, 2, i);
+        power(l, 3, i);
+        k = l*k; 
+        std::cout<< i << std::endl;
+        fout << "(2*3)^" << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
+     
+        // fout << "(11)^" << i << "," << str_for_test_on_hard_factorisation(k) << std::endl;
+// fout << "(" << num_of_mersen(7)  << ")^" << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
+
+    }
+
+
+
+    fout.close();
+
+}
+
+
+
+
 int main()
 {
 
@@ -321,45 +439,9 @@ int main()
     power(k,2,256);
     power(l,3,256);
     k = l*k;  
-    test(k, 100); // Реализована функция, которая заполняет файл log.csv. Замеряет 100 раз функции поиска делителя числа k, разными методами.  
-
-    std::map <NTL::ZZ, unsigned> m;
-    my_factorizator(k, m, NTL::ZZ(0));
-    std::cout << "Тест на рекурсивный \"Умный\" поиск делителей числа (2^256*3^256) "  << std::endl;
-    for (std::map <NTL::ZZ, unsigned>::iterator i=m.begin(); i!=m.end(); ++i)
-        std::cout << i->first << ' ' << i->second << std::endl;
-    
-    
-    std::cout << std::endl <<"Попробуем найти делитель: (чисело ферма 9)^2 и замерим время поиска" <<std::endl;
-    k = num_of_ferma(9);
-    auto begin = std::chrono::steady_clock::now();
-    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(30));
-    auto end = std::chrono::steady_clock::now();
-    auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
-
-    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " nanoseconds"<< std::endl;
  
 
-
-    std::cout << std::endl <<"Попробуем найти делитель:  (2^31-1)*(2^521-1) и замерим время поиска" <<std::endl;
-    power(k, 2, 31);
-    k--;
-    NTL::ZZ r;
-    power(r, 2, 521);
-    r--;
-    k=k*r;
-
-
-    begin = std::chrono::steady_clock::now();
-    k = method_Brent(k, NTL::ZZ(-1), NTL::ZZ(30));
-    end = std::chrono::steady_clock::now();
-    elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
-
-    std::cout<< k << " найдено за "<< std::to_string(elapsed_ms.count()) << " nanoseconds"<< std::endl;
-
-    std::cout<< std::endl <<"Запуск Теста на числах Мерсена. > запись в файл log1.csv " << std::endl;
-
-    test_for_hard(); // Тест на числах Мерсена. Указываем до какого проверить и записать замеры в файл log1.csv
+    test_on_num();
 
 
     std::cout<< "Done! " << std::endl;
