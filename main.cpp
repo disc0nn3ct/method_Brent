@@ -15,7 +15,7 @@ inline NTL::ZZ f(NTL::ZZ x) { return (x*x+1); }
 
 // Для того, чтобы тесты были объективнее, начальное случайное значение будет передаваться в алгоритм
 
-NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ x = NTL::ZZ(-1),NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po - algo 
+NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ x = NTL::ZZ(-1),NTL::ZZ num_of_tries = NTL::ZZ(16384)) // Po - algo  16384
 {
     NTL::ZZ y, divisor;
     if(x==-1)
@@ -35,7 +35,7 @@ NTL::ZZ method_Pollard(NTL::ZZ n, NTL::ZZ x = NTL::ZZ(-1),NTL::ZZ num_of_tries =
 
 
 // тут x это начальное значение для метода (рандомое)
-NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ x = NTL::ZZ(-1), NTL::ZZ num_of_tries = NTL::ZZ(14)) // max_i = 14 это 16384, чтобы в 2-х алгоритмах макс число шагов было одинаково 
+NTL::ZZ method_Brent(NTL::ZZ m, NTL::ZZ x = NTL::ZZ(-1), NTL::ZZ num_of_tries = NTL::ZZ(4)) // max_i = 14 это 16384, чтобы в 2-х алгоритмах макс число шагов было одинаково 
 {
     if (num_of_tries < 1)
         return NTL::ZZ(1);
@@ -372,7 +372,7 @@ std::string str_for_test_on_hard_factorisation(NTL::ZZ k) //  создаю ст�
     
     std::map <NTL::ZZ, unsigned> m;
     auto begin = std::chrono::steady_clock::now();
-    my_factorizator(k, m, NTL::ZZ(0));
+    // my_factorizator(k, m, NTL::ZZ(0));
     auto end = std::chrono::steady_clock::now();
     auto elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);    
 
@@ -381,7 +381,7 @@ std::string str_for_test_on_hard_factorisation(NTL::ZZ k) //  создаю ст�
     
     std::map <NTL::ZZ, unsigned> m_1;
     begin = std::chrono::steady_clock::now();
-    my_factorizator_Brent(k, m_1, NTL::ZZ(0));
+    my_factorizator_pollard(k, m_1, NTL::ZZ(0));
     end = std::chrono::steady_clock::now();
     elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);  
   
@@ -392,7 +392,7 @@ std::string str_for_test_on_hard_factorisation(NTL::ZZ k) //  создаю ст�
     std::map <NTL::ZZ, unsigned> m_2;
 
     begin = std::chrono::steady_clock::now();
-    my_factorizator_pollard(k, m_2, NTL::ZZ(0));
+    my_factorizator_Brent(k, m_2, NTL::ZZ(0));
     end = std::chrono::steady_clock::now();
     elapsed_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);  
 
@@ -409,7 +409,7 @@ void test_on_num()
     
     NTL::ZZ k, l;
 
-    for(int i=200; i < 10000; i+=200 )
+    for(int i=200; i < 50000; i+=200 )
     {
         // power(k, num_of_mersen(7), i);
         power(k, 2, i);
