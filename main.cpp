@@ -368,7 +368,8 @@ void my_factorizator_Brent(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ 
 std::string str_for_test_on_hard_factorisation(NTL::ZZ k) //  создаю строку с замерами времени факторизации чисел 
 {
     std::string str1;
-    str1=zToString(k) + ",";
+    // str1=zToString(k) + ","; // в комменте так как слишком большие файлы выходят из-за этого 
+    str1+= ","; 
     
     std::map <NTL::ZZ, unsigned> m;
     auto begin = std::chrono::steady_clock::now();
@@ -409,7 +410,7 @@ void test_on_num()
     
     NTL::ZZ k, l;
 
-    for(int i=200; i < 50000; i+=200 )
+    for(int i=200; i < 1000000; i+=200 )
     {
         // power(k, num_of_mersen(7), i);
         power(k, 2, i);
