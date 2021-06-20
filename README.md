@@ -29,6 +29,34 @@
 ![test_2](img/f_2.png)
 
 
+Графики реализации: 
+
+На простых числах Мерсена в квадрате: 
+
+![тест](img/f_3.png)
+
+Факторизация числа с проверкой на простоту (алгоритм перебора делителей до корня числа): 
+
+![0](img/pc.png)
+
+
+![1](img/pc1.png)
+
+![2](img/pc2.png)
+
+![3](img/pc11.png)
+
+![3](img/pc11.png)
+
+Факторизация числа без проверки на простоту: 
+
+![без проверки1](img/pc31_chisto_bes_proverki_na_prostotu.png)
+
+![без проверки2](img/pc66_chisto_bes_proverki_na_prostotu.png)
+
+![без проверки все на одном графике](img/pcALL_chisto_bes_proverki_na_prostotu.png)
+
+
 Используется библиотека [NTL](https://github.com/libntl/ntl)
 
 Установка: 
