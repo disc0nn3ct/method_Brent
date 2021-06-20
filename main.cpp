@@ -322,11 +322,14 @@ void my_factorizator_pollard(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::Z
 {
     if(m!=1)
     {
-        if(m!=2)
+        if(m!=31)
                 ++res[m];
-            else
-            if(m!=3) 
-                ++res[m];
+
+        // if(m!=2)
+        //         ++res[m];
+        //     else
+        //     if(m!=3) 
+        //         ++res[m];
             // else   
             //     if(prime(m) == true)
             //         ++res[m]; 
@@ -340,15 +343,20 @@ void my_factorizator_pollard(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::Z
     }
 }
 
+
 void my_factorizator_Brent(NTL::ZZ m, std::map<NTL::ZZ, unsigned> &res, NTL::ZZ not_used)
 {
     if(m!=1)
     {
-        if(m!=2)
+
+        if(m!=31)
             ++res[m];
-        else
-        if(m!=3) 
-            ++res[m];
+           
+        // if(m!=2)
+        //     ++res[m];
+        // else
+        // if(m!=3) 
+        //     ++res[m];
         // else
         // if(prime(m) == true)
         //     ++res[m]; 
@@ -413,11 +421,14 @@ void test_on_num()
     for(int i=200; i < 1000000; i+=200 )
     {
         // power(k, num_of_mersen(7), i);
-        power(k, 2, i);
-        power(l, 3, i);
-        k = l*k; 
+    
+        power(k, 31, i);
+        // power(k, 2, i);
+        // power(l, 3, i);
+        // k = l*k; 
         std::cout<< i << std::endl;
-        fout << "(2*3)^" << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
+        fout << "(31)^" << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
+        // fout << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
      
         // fout << "(11)^" << i << "," << str_for_test_on_hard_factorisation(k) << std::endl;
 // fout << "(" << num_of_mersen(7)  << ")^" << i <<"," << str_for_test_on_hard_factorisation(k) << std::endl;
